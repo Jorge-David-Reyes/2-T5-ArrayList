@@ -6,12 +6,18 @@ public class ArrayList <H> implements List<H>{
     private int size;
 
     public ArrayList() {
-        this.array = new Object[10];
+        this.array = new Object[1];
     }
 
     @Override
-    public void add(H data) {
-        this.array[size++] = data;
+    public void add(H data){
+        if(size >= array.length){
+            Object[] arrayClone = new Object[array.length + 2];
+            System.arraycopy(array, 0, arrayClone, 0, array.length);
+            this.array = arrayClone;
+        }
+        this.array[size] = data;
+        size++;
     }
 
     @Override
@@ -21,22 +27,45 @@ public class ArrayList <H> implements List<H>{
 
     @Override
     public void delete(int index) {
-        if(index==0){
-            for(int i=0; i<size; i++){
-                array[i]= array[i+1];
+        for(int i=1; i<size; i++){
+            if(index==0){
+                array[i-1]=array[i];
             }
-            size--;
-        }
-        if(index==size){
-            size--;
-        }
-        if(index >0 && index <size){
-            for(int i=0; i<size; i++){
-                if(index <= i) {
-                    array[i] = array[i + 1];
+            else if(index > 0 && index <size){
+                if(index <= i){
+                    array[i-1]=array[i];
                 }
             }
-            size--;
+            else if(index == size){
+                i=size;
+            }
+        }
+        size--;
+    }
+
+    public class ForwardIterator implements Iterator<H>{
+        private int index;
+
+        public boolean hasNext(){
+            return index < size;
+        }
+
+        public H next(){
+            return (H)array[index++];
+        }
+    }
+
+    public class ReverseIterator implements Iterator<H> {
+
+        private int reverseIndex=size-1;
+
+        public boolean hasNext(){
+
+            return reverseIndex >= 0;
+        }
+
+        public H next(){
+            return (H)array[reverseIndex--];
         }
     }
 
@@ -45,11 +74,16 @@ public class ArrayList <H> implements List<H>{
         return size;
     }
 
-    public Iterator<H> getIterator(){
-        return null;
+    @Override
+    public Iterator<H> getIterator() {
+
+        return new ForwardIterator();
     }
-    public Iterator<H> getReverseIterator(){
-        return null;
+
+    @Override
+    public ReverseIterator getReverseIterator() {
+
+        return new ReverseIterator();
     }
 
 
